@@ -36,21 +36,26 @@ var (
 	latin1Encoder = encoding.ISO8859_1.NewEncoder()
 )
 
+// FormOption is an interface representing the different types of values
+// a form field accepts.
 type FormOption interface {
 	String() string
 }
 
+// TextOption is the FomrOption type for text fields.
 type TextOption string
 
+// String() returns the  fdf string representation of a text field. i.e. (textValue).
 func (t TextOption) String() string { return "(" + string(t) + ")" }
 
-type ButtonOption bool
+// ButtonOption is the FormOption type for button fields.
+// The value of the button depends on the button type and the state options.
+// For example, the button may have states "On" and "Off" indicating whether or not the button is checked.
+type ButtonOption string
 
+// String() returns the  fdf string representation of a button. i.e. /buttonState.
 func (b ButtonOption) String() string {
-	if b {
-		return "/1"
-	}
-	return "/Off"
+	return "/" + string(b)
 }
 
 // Form represents the PDF form.
@@ -189,8 +194,9 @@ func createFdfFile(form Form, path string) error {
 	// Write the form data.
 	var valueStr string
 	for key, value := range form {
-		// Convert to Latin-1.
-		valueStr, err = latin1Encoder.String(fmt.Sprintf("%v", value))
+		// First converts the FormOption value to the correct fdf string representation.
+		// Then converts string to Latin-1.
+		valueStr, err = latin1Encoder.String(fmt.Sprintf("%v", value.String()))
 		if err != nil {
 			return fmt.Errorf("failed to convert string to Latin-1")
 		}
