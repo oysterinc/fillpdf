@@ -42,11 +42,13 @@ type FormOption interface {
 	String() string
 }
 
-// TextOption is the FomrOption type for text fields.
+// TextOption is the FormOption type for text fields.
 type TextOption string
 
 // String() returns the  fdf string representation of a text field. i.e. (textValue).
-func (t TextOption) String() string { return "(" + string(t) + ")" }
+func (t TextOption) String() string {
+	return "(" + string(t) + ")"
+}
 
 // ButtonOption is the FormOption type for button fields.
 // The value of the button depends on the button type and the state options.
@@ -128,7 +130,7 @@ func Fill(form Form, formPDFFile, destPDFFile string, options ...Options) (err e
 	// Create the temporary output file path.
 	outputFile := filepath.Clean(tmpDir + "/output.pdf")
 
-	// Create the fdf data file.
+	// Create the FDF data file.
 	fdfFile := filepath.Clean(tmpDir + "/data.fdf")
 	err = createFdfFile(form, fdfFile)
 	if err != nil {
@@ -188,7 +190,7 @@ func createFdfFile(form Form, path string) error {
 	// Create a new writer.
 	w := bufio.NewWriter(file)
 
-	// Write the fdf header.
+	// Write the FDF header.
 	fmt.Fprintln(w, fdfHeader)
 
 	// Write the form data.
@@ -196,7 +198,7 @@ func createFdfFile(form Form, path string) error {
 	for key, value := range form {
 		// First converts the FormOption value to the correct fdf string representation.
 		// Then converts string to Latin-1.
-		valueStr, err = latin1Encoder.String(fmt.Sprintf("%v", value.String()))
+		valueStr, err = latin1Encoder.String(value.String())
 		if err != nil {
 			return fmt.Errorf("failed to convert string to Latin-1")
 		}
